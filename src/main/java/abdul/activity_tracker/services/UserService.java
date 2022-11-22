@@ -7,5 +7,6 @@ import abdul.activity_tracker.model.User;
 public interface UserService {
     User signup(UserDto userDto) throws UserExistException;
     UserDto login(String email, String password);
+    String logout();
 
 }

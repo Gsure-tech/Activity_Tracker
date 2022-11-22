@@ -2,6 +2,7 @@ package abdul.activity_tracker.controller;
 
 import abdul.activity_tracker.dto.TaskDto;
 import abdul.activity_tracker.dto.UserDto;
+import abdul.activity_tracker.exceptions.ResourceNotFoundException;
 import abdul.activity_tracker.exceptions.UserExistException;
 import abdul.activity_tracker.model.User;
 //import abdul.activity_tracker.services.TaskService;
@@ -33,9 +34,9 @@ public ResponseEntity<String> signup(@RequestBody UserDto userDto) throws UserEx
 //return new ResponseEntity<>(userDto , HttpStatus.OK);
 //    }
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody UserDto userDto){
+    public ResponseEntity<String> login(@RequestBody UserDto userDto){
         UserDto userDetails = userService.login(userDto.getEmail(), userDto.getPassword());
-        //if(userDetails != null){
+       // if(userDetails != null){
 //            UserDto userDto = new UserDto();
 //            userDto.setEmail(user.getEmail());
 //            userDto.setFirstName(user.getFirstName());
@@ -48,9 +49,15 @@ public ResponseEntity<String> signup(@RequestBody UserDto userDto) throws UserEx
 //       userDto.setFirstName(user.getFirstName());
 //       userDto.setLastName(user.getLastName());
 //       userDto.setGender(user.getGender());
-            return new ResponseEntity<>(userDetails, HttpStatus.OK);
-       // }
-     // return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Login Successful", HttpStatus.OK);
+      //  }
+      //  throw new ResourceNotFoundException("User not signed in","please login");
+      //return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+    }
+    @GetMapping("/logout")
+    public ResponseEntity <String> logout(){
+      userService.logout();
+      return new ResponseEntity<>("Logout successful",HttpStatus.OK);
     }
 
 }

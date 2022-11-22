@@ -13,8 +13,8 @@ public interface TaskService {
     List <Task> viewPendingTask();
     List<Task> viewCompletedTask(TaskDto taskDto);
     List <Task> viewTaskInProgress(TaskDto taskDto);
-    Task moveTaskToPending(TaskDto taskDto);
-    Task moveTaskToDone(TaskDto taskDto);
+    Task moveTaskToPending(Long taskId, TaskDto taskDto);
+    Task moveTaskToDone(Long taskId, TaskDto taskDto);
     Task updateTask(Long taskId,TaskDto taskDto);
     String deleteTask(Long taskId);
 }

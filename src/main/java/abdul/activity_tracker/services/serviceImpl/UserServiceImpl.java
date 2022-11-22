@@ -57,4 +57,11 @@ public class UserServiceImpl implements UserService {
 //          .orElseThrow(()-> new UserExistException("incorrect email or password","try again"));
     }
 
+    @Override
+    public String logout() {
+        UserDto userDto = new UserDto();
+        session.invalidate();
+        return "user " + session.getAttribute(userDto.getFirstName() + "has logged out successfully");
+    }
+
 }

@@ -11,6 +11,8 @@ import abdul.activity_tracker.services.TaskService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -24,7 +26,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task createTask(TaskDto taskDto) {
-        User user = userRepository.findById((long)session.getAttribute("loginUser")).get();
+        User user = userRepository.findById((long)session.getAttribute("loginUser"))
+                .orElseThrow(()-> new ResourceNotFoundException("User not Signed in","Sign in"));
         Task task = new Task();
         task.setTaskName(taskDto.getTaskName());
         task.setDescription(taskDto.getDescription());
@@ -76,12 +79,24 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task moveTaskToPending(TaskDto taskDto) {
+    public Task moveTaskToPending(Long taskId, TaskDto taskDto) {
+        if(taskRepository.findById(taskId).isPresent()){
+            Task existingTask = taskRepository.findById(taskId).get();
+            existingTask.setStatus(Status.PENDING);
+            taskRepository.save(existingTask);
+            return existingTask;
+        }
         return null;
     }
 
     @Override
-    public Task moveTaskToDone(TaskDto taskDto) {
+    public Task moveTaskToDone(Long taskId, TaskDto taskDto) {
+        if(taskRepository.findById(taskId).isPresent()){
+            Task existingTask = taskRepository.findById(taskId).get();
+            existingTask.setCompletedAt(LocalDateTime.now());
+            taskRepository.save(existingTask);
+            return existingTask;
+        }
         return null;
     }
 
