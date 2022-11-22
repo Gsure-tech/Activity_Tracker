@@ -1,5 +1,11 @@
 package abdul.activity_tracker.exceptions;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class ResourceNotFoundException extends RuntimeException{
     private String debugMessage;
 

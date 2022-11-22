@@ -21,9 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-    private final TaskRepository taskRepository;
 
-    private HttpSession session;
+
+    private final HttpSession session;
     @Override
     public User signup(UserDto userDto) throws UserExistException {
        User user = new User();
@@ -42,77 +42,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto login(String email, String password) {
-      User user = userRepository.findByEmailAndPassword(email,password).get();
+      User user = userRepository.findByEmailAndPassword(email,password)
+              .orElseThrow(()-> new UserExistException("incorrect email or password","Try again"));
        UserDto userDto = new UserDto();
        userDto.setEmail(user.getEmail());
        userDto.setFirstName(user.getFirstName());
        userDto.setLastName(user.getLastName());
        userDto.setGender(user.getGender());
        session.setAttribute("loginUser", user.getId());
-    return userDto;
+
+       return userDto;
       // return userRepository.findByEmailAndPassword(email,password).orElse(null);
+//  return userRepository.findByEmailAndPassword(email,password)
+//          .orElseThrow(()-> new UserExistException("incorrect email or password","try again"));
     }
 
-
-    @Override
-    public Task createTask(TaskDto taskDto) {
-        User user = userRepository.findById((long)session.getAttribute("loginUser")).get();
-        Task task = new Task();
-        task.setTaskName(taskDto.getTaskName());
-        task.setDescription(taskDto.getDescription());
-        task.setStatus(Status.PENDING);
-        task.setUser(user);
-
-
-        return taskRepository.save(task);
-    }
-
-    @Override
-    public Task viewTask(Long taskId) {
-        User user = userRepository.findById((long)session.getAttribute("loginUser")).get();
-        Task task = taskRepository.findTaskByUserAndId(user, taskId).orElseThrow();
-        return task;
-    }
-
-    @Override
-    public List<Task> viewAllTask() {
-        User user = userRepository.findById((long)session.getAttribute("loginUser")).get();
-        List<Task> task = taskRepository.findAllByUser(user).orElseThrow();
-        return task;
-    }
-
-    @Override
-    public List<Task> viewPendingTask() {
-        User user = userRepository.findById((long)session.getAttribute("loginUser")).get();
-        List<Task> pendingTask = taskRepository.findTaskByStatusAndUser(Status.PENDING,user)
-                .orElseThrow(()->new ResourceNotFoundException("Task not found", "No pending Task available"));
-        return pendingTask;
-    }
-
-    @Override
-    public List<Task> viewCompletedTask(TaskDto taskDto) {
-        User user = userRepository.findById((long)session.getAttribute("loginUser")).get();
-        List<Task> completedTask = taskRepository.findTaskByStatusAndUser(Status.DONE,user)
-                .orElseThrow(()->new ResourceNotFoundException("Task not found", "No Task completed"));
-        return completedTask;
-    }
-
-    @Override
-    public List<Task> viewTaskInProgress(TaskDto taskDto) {
-        User user = userRepository.findById((long)session.getAttribute("loginUser")).get();
-        List<Task> inProgressTask = taskRepository.findTaskByStatusAndUser(Status.IN_PROGRESS,user)
-                .orElseThrow(()->new ResourceNotFoundException("Task not found", "None of your task is in progress"));
-        return inProgressTask;
-    }
-
-    @Override
-    public Task updateTask(TaskDto taskDto) {
-        return null;
-    }
-
-    @Override
-    public String deleteTask(Long taskId) {
-         taskRepository.deleteById(taskId);
-         return "Task deleted successfully";
-    }
 }

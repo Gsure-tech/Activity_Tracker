@@ -23,7 +23,8 @@ public class Task  {
     private Long id;
     @Column(nullable = false, length=50)
     private String taskName;
-    private String Description;
+    @Column(nullable = false)
+    private String description;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length =20)

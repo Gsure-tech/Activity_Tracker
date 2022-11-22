@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class TaskDto {
     private String taskName;
-    private String Description;
+    private String description;
     private Status status;
 }
