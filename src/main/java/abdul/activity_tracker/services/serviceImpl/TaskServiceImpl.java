@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -63,7 +62,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> viewCompletedTask(TaskDto taskDto) {
+    public List<Task> viewCompletedTask() {
         User user = userRepository.findById((long)session.getAttribute("loginUser")).get();
         List<Task> completedTask = taskRepository.findTaskByStatusAndUser(Status.DONE,user)
                 .orElseThrow(()->new ResourceNotFoundException("Task not found", "No Task completed"));
@@ -71,7 +70,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> viewTaskInProgress(TaskDto taskDto) {
+    public List<Task> viewTaskInProgress() {
         User user = userRepository.findById((long)session.getAttribute("loginUser")).get();
         List<Task> inProgressTask = taskRepository.findTaskByStatusAndUser(Status.IN_PROGRESS,user)
                 .orElseThrow(()->new ResourceNotFoundException("Task not found", "None of your task is in progress"));
@@ -90,9 +89,21 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public Task moveTaskToInProgress(Long taskId, TaskDto taskDto) {
+        if(taskRepository.findById(taskId).isPresent()){
+            Task existingTask = taskRepository.findById(taskId).get();
+            existingTask.setStatus(Status.PENDING);
+            taskRepository.save(existingTask);
+            return existingTask;
+        }
+        return null;
+    }
+
+    @Override
     public Task moveTaskToDone(Long taskId, TaskDto taskDto) {
         if(taskRepository.findById(taskId).isPresent()){
             Task existingTask = taskRepository.findById(taskId).get();
+            existingTask.setStatus(Status.DONE);
             existingTask.setCompletedAt(LocalDateTime.now());
             taskRepository.save(existingTask);
             return existingTask;
@@ -104,6 +115,7 @@ public class TaskServiceImpl implements TaskService {
     public Task updateTask(Long taskId,TaskDto taskDto) {
         if(taskRepository.findById(taskId).isPresent()){
             Task existingTask = taskRepository.findById(taskId).get();
+
             existingTask.setTaskName(taskDto.getTaskName());
             existingTask.setDescription(taskDto.getDescription());
             taskRepository.save(existingTask);

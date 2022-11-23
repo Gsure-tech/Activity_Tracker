@@ -18,11 +18,11 @@ public class User {
     private Long id;
     @Column(nullable=false, length = 30)
     private String firstName;
-   @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 30)
     private String lastName;
-   @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 30)
     private String email;
-   @Column(nullable = false, length=10)
+    @Column(nullable = false, length=10)
     private String password;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 10)
