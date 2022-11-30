@@ -11,7 +11,7 @@ import javax.persistence.Enumerated;
 import java.time.LocalDateTime;
 @Data
 public class TaskResponseDto {
-
+    private Long id;
     private String taskName;
     private String description;
     private Status status;

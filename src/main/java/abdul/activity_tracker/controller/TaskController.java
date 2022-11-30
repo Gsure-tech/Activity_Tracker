@@ -93,14 +93,19 @@ public class TaskController {
         return new ResponseEntity(taskResponseDto,HttpStatus.OK);
     }
 
-    @PutMapping("/changestatus/{taskId}")
-    public  ResponseEntity<Task> changeStatus (@RequestBody TaskDto taskDto){
-        return  new ResponseEntity<>(taskService.changeStatus(taskDto),HttpStatus.OK);
+    @PutMapping("/changestatus")
+    public  ResponseEntity<TaskResponseDto> changeStatus (@RequestBody TaskDto taskDto){
+        Task task = taskService.changeStatus(taskDto);
+        TaskResponseDto taskResponseDto = new TaskResponseDto();
+        BeanUtils.copyProperties(task,taskResponseDto);
+        return  new ResponseEntity<>(taskResponseDto,HttpStatus.OK);
     }
     @PutMapping("/update/{taskId}")
-    public  ResponseEntity<String> updateTask (@PathVariable Long taskId, @RequestBody TaskDto taskDto){
-        taskService.updateTask(taskId,taskDto);
-        return  new ResponseEntity<>("Task updated successfully",HttpStatus.OK);
+    public  ResponseEntity<TaskResponseDto> updateTask (@PathVariable Long taskId, @RequestBody TaskDto taskDto){
+       Task task = taskService.updateTask(taskId,taskDto);
+        TaskResponseDto taskResponseDto = new TaskResponseDto();
+        BeanUtils.copyProperties(task,taskResponseDto);
+        return  new ResponseEntity<>(taskResponseDto,HttpStatus.OK);
     }
     @DeleteMapping("/delete/{taskId}")
     public ResponseEntity<String> deleteTask(@PathVariable Long taskId){
