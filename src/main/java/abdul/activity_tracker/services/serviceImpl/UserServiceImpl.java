@@ -2,6 +2,7 @@ package abdul.activity_tracker.services.serviceImpl;
 
 import abdul.activity_tracker.dto.TaskDto;
 import abdul.activity_tracker.dto.UserDto;
+import abdul.activity_tracker.dto.UserResponseDto;
 import abdul.activity_tracker.enums.Gender;
 import abdul.activity_tracker.enums.Status;
 import abdul.activity_tracker.exceptions.ResourceNotFoundException;
@@ -12,6 +13,7 @@ import abdul.activity_tracker.repositories.TaskRepository;
 import abdul.activity_tracker.repositories.UserRepository;
 import abdul.activity_tracker.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
@@ -21,8 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
-
-
     private final HttpSession session;
     @Override
     public User signup(UserDto userDto) throws UserExistException {
@@ -35,7 +35,8 @@ public class UserServiceImpl implements UserService {
          user.setLastName(userDto.getLastName());
          user.setEmail(userDto.getEmail());
          user.setPassword(userDto.getPassword());
-        user.setGender(Gender.valueOf(String.valueOf(userDto.getGender())));
+         user.setGender(Gender.valueOf(String.valueOf(userDto.getGender())));
+
         // user.setGender(userDto.getGender());
         return userRepository.save(user);
     }
@@ -50,7 +51,6 @@ public class UserServiceImpl implements UserService {
        userDto.setLastName(user.getLastName());
        userDto.setGender(user.getGender());
        session.setAttribute("loginUser", user.getId());
-
        return userDto;
       // return userRepository.findByEmailAndPassword(email,password).orElse(null);
 //  return userRepository.findByEmailAndPassword(email,password)

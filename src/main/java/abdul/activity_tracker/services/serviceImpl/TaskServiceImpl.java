@@ -48,10 +48,10 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<Task> viewAllTask() {
         User user = userRepository.findById((long)session.getAttribute("loginUser")).get();
-        List<Task> task = taskRepository.findAllByUser(user)
-                .orElseThrow(()-> new ResourceNotFoundException("No task available","Task not found"));
+        List<Task> task = taskRepository.findAllByUser(user).orElseThrow(()-> new ResourceNotFoundException("No task available","Task not found"));
         return task;
     }
+
 
     @Override
     public List<Task> viewPendingTask() {
@@ -77,51 +77,36 @@ public class TaskServiceImpl implements TaskService {
         return inProgressTask;
     }
 
-    @Override
-    public Task moveTaskToPending(Long taskId, TaskDto taskDto) {
-        if(taskRepository.findById(taskId).isPresent()){
-            Task existingTask = taskRepository.findById(taskId).get();
-            existingTask.setStatus(Status.PENDING);
-            taskRepository.save(existingTask);
-            return existingTask;
-        }
-        return null;
-    }
+
 
     @Override
-    public Task moveTaskToInProgress(Long taskId, TaskDto taskDto) {
-        if(taskRepository.findById(taskId).isPresent()){
-            Task existingTask = taskRepository.findById(taskId).get();
-            existingTask.setStatus(Status.PENDING);
-            taskRepository.save(existingTask);
-            return existingTask;
-        }
-        return null;
-    }
+    public Task changeStatus( TaskDto taskDto) {
+        Long taskId = taskDto.getTaskId();
+       if(taskRepository.findById(taskId).isPresent()) {
+           Task task = taskRepository.findById(taskId).get();
+           task.setStatus(taskDto.getStatus());
+           if(taskDto.getStatus() == Status.DONE){
+               task.setCompletedAt(LocalDateTime.now());
+           }else{
+               task.setCompletedAt(null);
+           }
 
-    @Override
-    public Task moveTaskToDone(Long taskId, TaskDto taskDto) {
-        if(taskRepository.findById(taskId).isPresent()){
-            Task existingTask = taskRepository.findById(taskId).get();
-            existingTask.setStatus(Status.DONE);
-            existingTask.setCompletedAt(LocalDateTime.now());
-            taskRepository.save(existingTask);
-            return existingTask;
-        }
-        return null;
+           taskRepository.save(task);
+           return task;
+       }
+       throw new ResourceNotFoundException("failed to change status");
     }
 
     @Override
     public Task updateTask(Long taskId,TaskDto taskDto) {
         if(taskRepository.findById(taskId).isPresent()){
             Task existingTask = taskRepository.findById(taskId).get();
-
             existingTask.setTaskName(taskDto.getTaskName());
             existingTask.setDescription(taskDto.getDescription());
             taskRepository.save(existingTask);
             return existingTask;
         }
-        return null;
+        throw new ResourceNotFoundException("failed to update");
     }
 
     @Override

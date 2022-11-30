@@ -9,6 +9,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Setter
 @Getter
+@Builder
 @Data
 @Entity
 @Table(name = "user_table")
@@ -20,11 +21,11 @@ public class User {
     private String firstName;
     @Column(nullable = false, length = 30)
     private String lastName;
-    @Column(nullable = false, length = 30)
+    @Column(nullable = false, length = 50)
     private String email;
-    @Column(nullable = false, length=10)
+    @Column(nullable = false, length=50)
     private String password;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 20)
     private Gender gender;
 }

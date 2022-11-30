@@ -1,16 +1,19 @@
 package abdul.activity_tracker.controller;
 
 import abdul.activity_tracker.dto.TaskDto;
+import abdul.activity_tracker.dto.TaskResponseDto;
 import abdul.activity_tracker.exceptions.ResourceNotFoundException;
 import abdul.activity_tracker.model.Task;
 import abdul.activity_tracker.repositories.UserRepository;
 import abdul.activity_tracker.services.TaskService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -21,54 +24,83 @@ public class TaskController {
    private final UserRepository userRepository;
    private final HttpSession session;
     @PostMapping("/createTask")
-    public ResponseEntity<String> createTask (@RequestBody TaskDto taskDto) {
+    public ResponseEntity<TaskResponseDto> createTask (@RequestBody TaskDto taskDto) {
         if (session.getAttribute("loginUser") != null) {
-            taskService.createTask(taskDto);
-            return new ResponseEntity<>("Task created successful", HttpStatus.CREATED);
+           Task task= taskService.createTask(taskDto);
+            TaskResponseDto taskResponseDto = new TaskResponseDto();
+            BeanUtils.copyProperties(task,taskResponseDto);
+            return new ResponseEntity<>(taskResponseDto, HttpStatus.CREATED);
         }
        throw new ResourceNotFoundException("User not signed in", "please login");
    // return new ResponseEntity<>("User Not signed in", HttpStatus.BAD_REQUEST);
     }
     @GetMapping("/viewTask/{taskId}")
-    public ResponseEntity<Task> viewTask(@PathVariable Long taskId){
+    public ResponseEntity<TaskResponseDto> viewTask(@PathVariable Long taskId){
             Task task =   taskService.viewTask(taskId);
-               return new ResponseEntity<>(task,HttpStatus.OK);
+        TaskResponseDto taskResponseDto = new TaskResponseDto();
+        BeanUtils.copyProperties(task,taskResponseDto);
+        return new ResponseEntity<>(taskResponseDto,HttpStatus.OK);
     }
     @GetMapping("/viewAllTask")
-    public ResponseEntity <List<Task>> viewAllTask(){
+    public ResponseEntity <List<TaskResponseDto>> viewAllTask(){
         List<Task> task = taskService.viewAllTask();
-        return new ResponseEntity<>(task,HttpStatus.OK);
+        List <TaskResponseDto> taskResponseDto = new ArrayList<>();
+        for(Task tasks: task){
+            TaskResponseDto taskResponseDto1 = new TaskResponseDto();
+            BeanUtils.copyProperties(tasks,taskResponseDto1);
+            taskResponseDto.add(taskResponseDto1);
+        }
+
+      //  BeanUtils.copyProperties(task,taskResponseDto);
+        return new ResponseEntity(taskResponseDto,HttpStatus.OK);
     }
     @GetMapping("/viewPending")
-    public ResponseEntity <List<Task>> viewPending(){
+    public ResponseEntity <List<TaskResponseDto>> viewPending(){
         List<Task> task = taskService.viewPendingTask();
-        return new ResponseEntity<>(task,HttpStatus.OK);
+        List <TaskResponseDto> taskResponseDto = new ArrayList<>();
+        for(Task tasks: task){
+            TaskResponseDto taskResponseDto1 = new TaskResponseDto();
+            BeanUtils.copyProperties(tasks,taskResponseDto1);
+            taskResponseDto.add(taskResponseDto1);
+        }
+
+        //  BeanUtils.copyProperties(task,taskResponseDto);
+        return new ResponseEntity(taskResponseDto,HttpStatus.OK);
     }
     @GetMapping("/viewCompleted")
-    public ResponseEntity <List<Task>> viewCompleted(){
+    public ResponseEntity <List<TaskResponseDto>> viewCompleted(){
         List<Task> task = taskService.viewCompletedTask();
-        return new ResponseEntity<>(task,HttpStatus.OK);
+        List <TaskResponseDto> taskResponseDto = new ArrayList<>();
+        for(Task tasks: task){
+            TaskResponseDto taskResponseDto1 = new TaskResponseDto();
+            BeanUtils.copyProperties(tasks,taskResponseDto1);
+            taskResponseDto.add(taskResponseDto1);
+        }
+
+        return new ResponseEntity(taskResponseDto,HttpStatus.OK);
     }
     @GetMapping("/viewProgress")
     public ResponseEntity <List<Task>> viewTaskInProgress(){
         List<Task> task = taskService.viewTaskInProgress();
-        return new ResponseEntity<>(task,HttpStatus.OK);
+        List <TaskResponseDto> taskResponseDto = new ArrayList<>();
+        for(Task tasks: task){
+            TaskResponseDto taskResponseDto1 = new TaskResponseDto();
+            BeanUtils.copyProperties(tasks,taskResponseDto1);
+            taskResponseDto.add(taskResponseDto1);
+        }
+
+        //  BeanUtils.copyProperties(task,taskResponseDto);
+        return new ResponseEntity(taskResponseDto,HttpStatus.OK);
     }
-    @PutMapping("/movepending/{taskId}")
-    public  ResponseEntity<Task> moveToPending (@PathVariable Long taskId, TaskDto taskDto){
-        return  new ResponseEntity<>(taskService.moveTaskToPending(taskId,taskDto),HttpStatus.OK);
-    }
-    @PutMapping("/moveprogress/{taskId}")
-    public  ResponseEntity<Task> moveToInProgress (@PathVariable Long taskId, TaskDto taskDto){
-        return  new ResponseEntity<>(taskService.moveTaskToInProgress(taskId,taskDto),HttpStatus.OK);
-    }
-    @PutMapping("/movedone/{taskId}")
-    public  ResponseEntity<Task> moveToDone (@PathVariable Long taskId, TaskDto taskDto){
-        return  new ResponseEntity<>(taskService.moveTaskToDone(taskId,taskDto),HttpStatus.OK);
+
+    @PutMapping("/changestatus/{taskId}")
+    public  ResponseEntity<Task> changeStatus (@RequestBody TaskDto taskDto){
+        return  new ResponseEntity<>(taskService.changeStatus(taskDto),HttpStatus.OK);
     }
     @PutMapping("/update/{taskId}")
-    public  ResponseEntity<Task> updateTask (@PathVariable Long taskId, TaskDto taskDto){
-        return  new ResponseEntity<>(taskService.updateTask(taskId,taskDto),HttpStatus.OK);
+    public  ResponseEntity<String> updateTask (@PathVariable Long taskId, @RequestBody TaskDto taskDto){
+        taskService.updateTask(taskId,taskDto);
+        return  new ResponseEntity<>("Task updated successfully",HttpStatus.OK);
     }
     @DeleteMapping("/delete/{taskId}")
     public ResponseEntity<String> deleteTask(@PathVariable Long taskId){
